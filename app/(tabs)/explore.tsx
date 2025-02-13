@@ -5,9 +5,6 @@ import html2canvas from "html2canvas";
 
 const imageUrl =
   "http://localhost:3000/proxy-image";
-
-  
-
 const App = () => {
   const viewRef = useRef(null);
   const captureScreenshot = async () => {
