@@ -1,109 +1,120 @@
-import { StyleSheet, Image, Platform } from 'react-native';
+import React, { useRef } from "react";
+import { View, Text, Button, Image, Platform } from "react-native";
+import { captureRef } from "react-native-view-shot";
+import html2canvas from "html2canvas";
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+const imageUrl =
+  "http://localhost:3000/proxy-image";
 
-export default function TabTwoScreen() {
+  
+
+const App = () => {
+  const viewRef = useRef(null);
+  const captureScreenshot = async () => {
+    try {
+      if (Platform.OS === "web") {
+        if (viewRef.current) {
+          const element = document.getElementById("captureView");
+          if (element) {
+            const canvas = await html2canvas(element, {
+              useCORS: true,
+              allowTaint: true,
+            });
+            const image = canvas.toDataURL("image/png");
+            console.log(image);
+          } else {
+            console.error("Element not found for capturing screenshot.");
+          }
+        }
+      } else {
+        const image = await captureRef(viewRef, {
+          format: "png",
+          quality: 1,
+        });
+        console.log(image);
+      }
+    } catch (error) {
+      console.error("Error capturing screenshot:", error);
+    }
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Explore</ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Custom fonts">
-        <ThemedText>
-          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-          <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-            custom fonts such as this one.
-          </ThemedText>
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user's current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
-  );
-}
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: "#fde4e4",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 20,
+      }}
+    >
+      {/* Banner */}
+      <View
+        style={{
+          backgroundColor: "#ff6699",
+          width: "100%",
+          padding: 15,
+          alignItems: "center",
+        }}
+      >
+        <Text style={{ color: "#fff", fontSize: 22, fontWeight: "bold" }}>
+          Happy Birthday
+        </Text>
+      </View>
 
-const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-});
+      {/* Capturable View */}
+      <View
+        id="captureView"
+        ref={viewRef}
+        style={{
+          backgroundColor: "#fff",
+          padding: 20,
+          alignItems: "center",
+          borderWidth: 5,
+          borderColor: "#ff6699",
+          marginVertical: 20,
+          borderRadius: 15,
+          shadowColor: "#000",
+          shadowOpacity: 0.2,
+          shadowRadius: 10,
+          width: "90%",
+        }}
+      >
+        <Text style={{ fontSize: 18, color: "#333", fontWeight: "bold" }}>
+          On your special day, I wish you all the happiness,
+        </Text>
+        <Text style={{ fontSize: 18, color: "#333", fontWeight: "bold" }}>
+          success, and fulfillment your heart can hold.
+        </Text>
+        <Image
+          source={{ uri: imageUrl }}
+          style={{ width: 300, height: 200, marginVertical: 10, borderRadius: 10 }}
+        />
+      </View>
+
+      {/* Footer */}
+      <View
+        style={{
+          backgroundColor: "#000066",
+          width: "100%",
+          padding: 15,
+          alignItems: "center",
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
+        <Text style={{ color: "#fff", fontSize: 16 }}>Somaskaher Rao and Family</Text>
+        <View
+          style={{ backgroundColor: "#fff", padding: 5, borderRadius: 5 }}
+        >
+          <Text style={{ fontSize: 12 }}>📷 Make your card</Text>
+        </View>
+      </View>
+
+      {/* Capture Button */}
+      <Button title="Capture Screenshot" onPress={captureScreenshot} />
+    </View>
+  );
+};
+
+export default App;

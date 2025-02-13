@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hover Card with Buttons</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .card {
+            position: relative;
+            width: 300px;
+            height: 450px;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: #fff;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .card img {
+            width: 100%;
+            height: 60%;
+            object-fit: cover;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 50px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .button-container {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .button {
+            padding: 10px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <img id="cardImage" src="https://greeting-studio-mini-app-cards.s3.ap-south-1.amazonaws.com/good+morning+temp/(Hindi)+(Hindi).jpg" alt="Greeting" crossorigin="anonymous">
+        <div class="footer">Good Morning! Have a great day! ☀️</div>
+        <div class="button-container">
+            <button class="button" onclick="handleDownloadAndConvert()">Download & Convert</button>
+        </div>
+    </div>
+
+    <script>
+        async function handleDownloadAndConvert() {
+            const imageUrl = document.getElementById("cardImage").src;
+            try {
+                const response = await fetch(imageUrl, { mode: "cors" });
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                
+                // Create and download the image
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = "greeting_image.jpg";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                // Convert to Base64
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const base64String = reader.result;
+                    alert("Base64:\n" + base64String);
+                    console.log(base64String);
+                    
+                    // Revoke URL to clean up memory
+                    URL.revokeObjectURL(url);
+                };
+                reader.readAsDataURL(blob);
+
+            } catch (error) {
+                console.error("Error handling the image:", error);
+                alert("Failed to process the image. Try again later.");
+            }
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to Base64 & Share</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .custom-file-upload {
+            display: inline-block;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+        .custom-file-upload:hover {
+            background-color: #0056b3;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #loading {
+            display: none;
+            margin-top: 20px;
+        }
+        #loading i {
+            font-size: 24px;
+            color: #007bff;
+        }
+        #imagePreview {
+            display: none;
+            margin-top: 20px;
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #data {
+            margin-top: 20px;
+            word-wrap: break-word;
+        }
+    </style>
+    <script src="https://cdn.convegenius.ai/public/mini_app_extension/mini-app-sdk-v3.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Image to Base64 & Share</h1>
+        <label for="imageInput" class="custom-file-upload">
+            <i class="fas fa-cloud-upload-alt"></i> Select Image
+        </label>
+        <input type="file" id="imageInput" accept="image/*" aria-label="Image file input">
+        <img id="imagePreview" alt="Image Preview">
+        <button onclick="convertAndShare()">Share Image</button>
+        <div id="loading">
+            <i class="fas fa-spinner fa-spin"></i> Processing...
+        </div>
+        <p id="data" aria-live="polite"></p>
+    </div>
+
+    <script>
+        function convertAndShare() {
+            const fileInput = document.getElementById('imageInput');
+            const loadingIndicator = document.getElementById('loading');
+            const dataParagraph = document.getElementById('data');
+            const imagePreview = document.getElementById('imagePreview');
+
+            if (fileInput.files.length === 0) {
+                alert("Please select an image first.");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onloadstart = function () {
+                loadingIndicator.style.display = 'block';
+                dataParagraph.textContent = '';
+            };
+
+            reader.onload = function (e) {
+                // Display the selected image
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+
+                // Extract Base64 string
+                const base64String = e.target.result.split(",")[1];
+                const mimeType = file.type;
+console.log(MiniAppExtension)
+                MiniAppExtension.shareFile(
+                    mimeType,
+                    base64String,
+                    "Shared Image",
+                    (data) => {
+                        dataParagraph.textContent = "Received: " + data;
+                    }
+                );
+            };
+
+            reader.onloadend = function () {
+                loadingIndicator.style.display = 'none';
+            };
+
+            reader.onerror = function (error) {
+                console.error("Error reading file:", error);
+                loadingIndicator.style.display = 'none';
+                alert("An error occurred while processing the file.");
+            };
+
+            reader.readAsDataURL(file);
+        }
+    </script>
+</body>
+</html>
